@@ -9,10 +9,18 @@ import com.google.firebase.messaging.RemoteMessage
 
 class PushNotificationService : FirebaseMessagingService() {
 
+    lateinit var textToSpeech: TextToSpeechHelper
+
+    override fun onCreate() {
+        super.onCreate()
+        textToSpeech = TextToSpeechHelper(this)
+    }
+
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         val title = message.notification?.title ?: "Default Title"
         val body = message.notification?.body ?: "Default Body"
+        textToSpeech.speak(body)
 
         val notificationManager =
             getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -38,5 +46,10 @@ class PushNotificationService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        textToSpeech.shutdown()
     }
 }
