@@ -6,7 +6,7 @@ import android.util.Log
 import java.util.Locale
 
 class TextToSpeechHelper(
-    private val context: Context
+    context: Context
 ) : TextToSpeech.OnInitListener {
     private var textToSpeech: TextToSpeech? = null
 
@@ -16,13 +16,23 @@ class TextToSpeechHelper(
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            val result = textToSpeech?.setLanguage(Locale.US) // Set language
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS", "Language not supported")
+            val isVietnameseSupported = textToSpeech?.isLanguageAvailable(Locale("vi"))
+            if (isVietnameseSupported == TextToSpeech.LANG_AVAILABLE || isVietnameseSupported == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
+                Log.d("lamnb", "onInit:  Vietnamese language is supported")
+            } else {
+                // Handle the case where Vietnamese is not available
+                Log.d("lamnb", "onInit:  Vietnamese language not available")
             }
         } else {
             Log.e("TTS", "Initialization failed")
         }
+
+        /*// For 21+
+        val voices = textToSpeech?.voices
+        val vietnameseVoice = voices?.find { it.locale == Locale("vi") }
+        if (vietnameseVoice != null) {
+            textToSpeech?.voice = vietnameseVoice
+        }*/
     }
 
     fun speak(text: String) {

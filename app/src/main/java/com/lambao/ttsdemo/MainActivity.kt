@@ -1,6 +1,8 @@
 package com.lambao.ttsdemo
 
+import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -27,6 +29,10 @@ class MainActivity : AppCompatActivity() {
         binding.btnSpeak.setOnClickListener {
             val text = binding.etInput.text.toString()
             textToSpeech.speak(text)
+        }
+        binding.btnDownloadVoice.setOnClickListener {
+            val installIntent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
+            startActivity(installIntent)
         }
     }
 }
