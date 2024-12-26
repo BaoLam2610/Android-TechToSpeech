@@ -34,12 +34,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val textToSpeech by lazy {
-        TextToSpeechHelper(this)
-    }
+    private lateinit var textToSpeechHelper: TextToSpeechHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        textToSpeechHelper = TextToSpeechHelper.getInstance(this)
         askNotificationPermission()
         binding = ActivityMainBinding.inflate(layoutInflater)
         enableEdgeToEdge()
@@ -52,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnSpeak.setOnClickListener {
             val text = binding.etInput.text.toString()
-            textToSpeech.speak(text)
+            textToSpeechHelper.speak(text)
         }
         binding.btnDownloadVoice.setOnClickListener {
             val installIntent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
@@ -106,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         val fcmScope = "https://www.googleapis.com/auth/firebase.messaging"
         try {
             val jsonString = """
-                
+               
             """.trimIndent()
             val stream = ByteArrayInputStream(jsonString.toByteArray(StandardCharsets.UTF_8))
             val googleCredential = GoogleCredentials.fromStream(stream)

@@ -2,12 +2,29 @@ package com.lambao.ttsdemo
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import java.util.Locale
 
-class TextToSpeechHelper(
+class TextToSpeechHelper private constructor(
     context: Context
 ) : TextToSpeech.OnInitListener {
+    companion object {
+        @Volatile
+        private var INSTANCE: TextToSpeechHelper? = null
+
+        fun getInstance(context: Context): TextToSpeechHelper {
+            synchronized(this) {
+                var instance = INSTANCE
+                if (instance == null) {
+                    instance = TextToSpeechHelper(context.applicationContext)
+                    INSTANCE = instance
+                }
+                return instance
+            }
+        }
+    }
+
     private var textToSpeech: TextToSpeech? = null
 
     init {
@@ -37,6 +54,23 @@ class TextToSpeechHelper(
 
     fun speak(text: String) {
         textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+    }
+
+    fun speakWithCallback(text: String, onComplete: () -> Unit) {
+        textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) {
+                // Speech started
+            }
+
+            override fun onDone(utteranceId: String?) {
+                onComplete() // Call the callback when speech is done
+            }
+
+            override fun onError(utteranceId: String?) {
+                // Speech error
+            }
+        })
     }
 
     fun stop() {
